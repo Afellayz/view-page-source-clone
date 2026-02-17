@@ -13,10 +13,10 @@ export default function Home() {
     setSource("Chargement du code source...");
 
     try {
-      // On appelle une "API" (qu'on va créer à l'étape suivante)
-      const response = await fetch(`/api/fetch?url=${encodeURIComponent(url)}`);
+      // Utilisation du proxy "AllOrigins" pour contourner les CORS gratuitement
+      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
       const data = await response.json();
-      setSource(data.content || "Impossible de récupérer le code.");
+      setSource(data.contents || "Impossible de récupérer le code.");
     } catch (error) {
       setSource("Erreur lors de la récupération.");
     } finally {
