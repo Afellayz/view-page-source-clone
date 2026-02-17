@@ -17,20 +17,21 @@ export default function Home() {
     setSource(`Chargement du code source de : ${targetUrl}...`);
 
     try {
-      // Utilisation du proxy "AllOrigins" pour contourner les CORS gratuitement
-      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`);
+      // Utilisation du proxy "CodeTabs" pour une meilleure fiabilité
+      const response = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`);
 
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`);
       }
 
-      const data = await response.json();
+      // CodeTabs retourne directement le contenu (pas de JSON wrapper)
+      const data = await response.text();
 
-      if (!data.contents) {
+      if (!data) {
         throw new Error("Aucun contenu retourné par le proxy.");
       }
 
-      setSource(data.contents);
+      setSource(data);
     } catch (error: any) {
       setSource(`Erreur : ${error.message || "Une erreur inconnue est survenue."}`);
     } finally {
