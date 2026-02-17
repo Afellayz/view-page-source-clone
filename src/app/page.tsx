@@ -9,16 +9,30 @@ export default function Home() {
 
   const handleSearch = async () => {
     if (!url) return;
+
+    // Ajout automatique de https:// si absent
+    const targetUrl = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+
     setLoading(true);
-    setSource("Chargement du code source...");
+    setSource(`Chargement du code source de : ${targetUrl}...`);
 
     try {
       // Utilisation du proxy "AllOrigins" pour contourner les CORS gratuitement
-      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`);
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
       const data = await response.json();
-      setSource(data.contents || "Impossible de récupérer le code.");
-    } catch (error) {
-      setSource("Erreur lors de la récupération.");
+
+      if (!data.contents) {
+        throw new Error("Aucun contenu retourné par le proxy.");
+      }
+
+      setSource(data.contents);
+    } catch (error: any) {
+      setSource(`Erreur : ${error.message || "Une erreur inconnue est survenue."}`);
     } finally {
       setLoading(false);
     }
