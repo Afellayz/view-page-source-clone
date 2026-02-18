@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 
+const { js_beautify } = require("js-beautify");
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+
 export default function Home() {
   const [url, setUrl] = useState("");
   const [source, setSource] = useState("");
@@ -31,7 +35,17 @@ export default function Home() {
         throw new Error("Aucun contenu retourné par le proxy.");
       }
 
-      setSource(data);
+      // Formatage du HTML
+      const formatted = js_beautify(data, {
+        indent_size: 2,
+        html: {
+          end_with_newline: true,
+          js: { indent_size: 2 },
+          css: { indent_size: 2 },
+        },
+      });
+
+      setSource(formatted);
     } catch (error: any) {
       setSource(`Erreur : ${error.message || "Une erreur inconnue est survenue."}`);
     } finally {
@@ -62,10 +76,23 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="bg-[#111] text-green-400 p-6 rounded-xl overflow-x-auto text-left shadow-2xl min-h-[400px] border border-gray-700">
-          <pre className="whitespace-pre-wrap break-all text-sm">
-            <code>{source || "// Le code source s'affichera ici..."}</code>
-          </pre>
+        <div className="bg-[#1e1e1e] text-left shadow-2xl min-h-[400px] border border-gray-700 rounded-xl overflow-hidden relative">
+          {source ? (
+            <SyntaxHighlighter
+              language="html"
+              style={vscDarkPlus}
+              customStyle={{ margin: 0, padding: '1.5rem', fontSize: '0.875rem', lineHeight: '1.5' }}
+              showLineNumbers={true}
+              wrapLines={true}
+              wrapLongLines={true}
+            >
+              {source}
+            </SyntaxHighlighter>
+          ) : (
+            <div className="p-6 text-green-400 font-mono text-sm">
+               // Le code source formatté s'affichera ici...
+            </div>
+          )}
         </div>
       </div>
     </main>
